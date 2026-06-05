@@ -49,6 +49,7 @@ All bindings use the prefix (`Ctrl+a`) unless noted.
 | `prefix \|` | Split the current pane **horizontally** (left/right). Opens in the same directory. |
 | `prefix -` | Split the current pane **vertically** (top/bottom). Opens in the same directory. |
 | `prefix h/j/k/l` | Move focus to the pane left / down / up / right. |
+| `prefix ←/↓/↑/→` | Same as above using arrow keys. |
 | `prefix H/J/K/L` | **Resize** the current pane left / down / up / right by 5 cells. Repeatable — hold prefix and keep pressing. |
 | `prefix x` | Kill the current pane without a confirmation prompt. |
 
@@ -126,7 +127,8 @@ Prefix = Ctrl+a
 ─ Panes ──────────────────────────────
 prefix |       split right
 prefix -       split down
-prefix h/j/k/l move between panes
+prefix h/j/k/l  move between panes
+prefix ←/↓/↑/→  move between panes
 prefix H/J/K/L resize pane
 prefix x       kill pane
 
