@@ -64,6 +64,19 @@ All bindings use the prefix (`Ctrl+a`) unless noted.
 | `prefix >` | Move the current window one position to the right. |
 | `prefix X` | Kill the current window without a confirmation prompt. |
 
+### Sessions
+
+| Key | Action |
+|---|---|
+| `prefix Ctrl+s` | Save all sessions and windows to disk (see [scripts/](scripts/README.md)). |
+| `prefix Ctrl+r` | Restore saved sessions after a reboot or fresh tmux start. |
+| `prefix (` | Previous session (stock tmux). |
+| `prefix )` | Next session (stock tmux). |
+| `prefix s` | Interactive session picker (stock tmux). |
+| `prefix L` | Jump to last-used session (stock tmux). |
+
+Sessions auto-save whenever you create a window, kill a pane, or start a new session. The snapshot lives at `~/.local/share/tmux/sessions`.
+
 ---
 
 ## Copy Mode
@@ -96,9 +109,9 @@ The status bar and UI elements use the [Catppuccin Mocha](https://github.com/cat
 
 | Variable | Hex | Used for |
 |---|---|---|
-| `mocha_base` | `#1e1e2e` | Status bar background |
-| `mocha_surface0` | `#313244` | Inactive window tab background, message bar |
-| `mocha_surface1` | `#45475a` | Date segment background |
+| `mocha_base` | `#11111b` | Powerline arrow target, pill backdrops (crust — darkest) |
+| `mocha_surface0` | `#313244` | Status bar background, inactive tab fill (lighter for contrast vs terminal bg) |
+| `mocha_surface1` | `#1e1e2e` | Date segment background (Catppuccin base) |
 | `mocha_overlay1` | `#7f849c` | Subtle UI text |
 | `mocha_subtext1` | `#bac2de` | Inactive window tab text, date text |
 | `mocha_text` | `#cdd6f4` | Default foreground text |
@@ -113,8 +126,9 @@ The status bar and UI elements use the [Catppuccin Mocha](https://github.com/cat
  ^mauve^    ^inactive tabs^   ^active tab^            ^surface1^   ^blue^
 ```
 
+- **Bar background**: `mocha_surface0` (`#313244`) — kept lighter than the surrounding palette so it stands out from a dark terminal background instead of blending in.
 - **Left**: Session name in a mauve pill with powerline arrows.
-- **Center**: Window tabs — inactive in `surface0`, active in `lavender`.
+- **Center**: Window tabs — inactive on `surface0`, active in `lavender`.
 - **Right**: Date in `surface1`, time in `blue`.
 
 ---
@@ -138,6 +152,13 @@ prefix Ctrl+h  previous window
 prefix Ctrl+l  next window
 prefix < / >   reorder window
 prefix X       kill window
+
+─ Sessions ───────────────────────────
+prefix Ctrl+s  save sessions
+prefix Ctrl+r  restore sessions
+prefix ( / )   prev / next session
+prefix s       session picker
+prefix L       last session
 
 ─ Copy mode ──────────────────────────
 prefix Enter   enter copy mode
