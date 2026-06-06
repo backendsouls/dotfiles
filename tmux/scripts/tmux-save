@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SAVE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/tmux"
+SAVE_FILE="$SAVE_DIR/sessions"
+LOCK_FILE="$SAVE_DIR/.restoring"
+
+# Skip while tmux-restore is recreating windows — otherwise each new-window
+# hook re-enters save, fires display-message, and storms the status line.
+[[ -e "$LOCK_FILE" ]] && exit 0
+
+mkdir -p "$SAVE_DIR"
+
+tmp="$(mktemp "$SAVE_FILE.XXXXXX")"
+trap 'rm -f "$tmp"' EXIT
+
+# Drop session names that can't round-trip through `new-session -s`: empty,
+# leading-dash (parsed as a flag), tmux meta chars (: .), or path-like (/).
+tmux list-windows -a -F $'#{session_name}\t#{pane_current_path}' \
+    | awk -F'\t' 'NF == 2 && $1 != "" && $1 !~ /^-/ && $1 !~ /[\/:.]/' \
+    > "$tmp"
+
+mv "$tmp" "$SAVE_FILE"
+trap - EXIT
+
+tmux display-message "Saved $(wc -l < "$SAVE_FILE") windows"

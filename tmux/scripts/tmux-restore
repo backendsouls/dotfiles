@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SAVE_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/tmux"
+SAVE_FILE="$SAVE_DIR/sessions"
+LOCK_FILE="$SAVE_DIR/.restoring"
+
+[[ -f "$SAVE_FILE" ]] || { echo "No saved sessions at $SAVE_FILE"; exit 1; }
+
+# Hold the lock so the after-new-* hooks skip tmux-save while we recreate
+# windows; otherwise every iteration re-saves and floods the status line.
+mkdir -p "$SAVE_DIR"
+: > "$LOCK_FILE"
+trap 'rm -f "$LOCK_FILE"' EXIT
+
+declare -A state
+
+while IFS=$'\t' read -r session path; do
+    [[ -z "$session" || -z "$path" ]] && continue
+    # Match the validation in tmux-save: skip anything that can't survive
+    # `new-session -s` cleanly.
+    [[ "$session" == -* ]] && continue
+    [[ "$session" == *[/:.]* ]] && continue
+
+    [[ -d "$path" ]] || path="$HOME"
+
+    case "${state[$session]:-}" in
+        "")
+            if tmux has-session -t "=$session" 2>/dev/null; then
+                state[$session]=skip
+            else
+                tmux new-session -d -s "$session" -c "$path"
+                state[$session]=created
+            fi
+            ;;
+        skip)
+            continue
+            ;;
+        created)
+            tmux new-window -t "=$session:" -c "$path"
+            ;;
+    esac
+done < "$SAVE_FILE"
+
+created=()
+for s in "${!state[@]}"; do
+    [[ "${state[$s]}" == "created" ]] && created+=("$s")
+done
+echo "Restored: ${created[*]:-(nothing — all sessions already existed or were skipped)}"
